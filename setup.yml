@@ -1,0 +1,10 @@
+---
+- hosts: all
+
+- import_playbook: ubuntu-base.yml
+  vars:
+    username: linuxdev
+    groupname: developers
+    password: "@weS0meDev"
+- import_playbook: kde.yml
+- import_playbook: development.yml

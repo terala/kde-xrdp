@@ -1,0 +1,29 @@
+- hosts: all
+
+  vars:
+    graphics_pkgs:
+      - plasma-desktop
+      - kde-baseapps
+      - xrdp
+
+  become: yes
+  tasks:
+    - name: install KDE Plasma Desktop
+      apt:
+        name: "{{ graphics_pkgs }}"
+        state: present
+        update_cache: yes
+
+    - name: Open firewall ports for xrdg
+      ufw:
+        rule: allow
+        port: "3389" # rdp port
+        direction: in
+        proto: any
+
+    - name: Ensure XRDP server is started
+      systemd:
+        name: xrdp
+        enabled: true
+        masked: false
+        daemon_reload: true

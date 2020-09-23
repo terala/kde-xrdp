@@ -1,0 +1,71 @@
+- hosts: all
+
+  vars:
+    username: linuxdev
+    groupname: developers
+    password: "@weS0meDev"
+
+    groups:
+      - "{{ groupname }}"
+      - docker
+
+    base_pkgs:
+      - zsh
+      - vim
+      - vim-addon-manager
+      - vim-airline
+      - vim-airline-themes
+      - vim-common
+      - vim-editorconfig
+      - vim-fugitive
+      - tmux
+      - git
+      - git-lfs
+      - git-extras
+      - fzf
+
+  become: yes
+  tasks:
+    - name: Set a friendly hostname
+      hostname:
+        name: devbox
+
+    - name: Install base packages
+      apt:
+        name: "{{ base_pkgs }}"
+        state: present
+        update_cache: yes
+
+    - name: Create groups
+      group:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - "{{ groupname }}"
+        - docker
+
+    - name: Create user
+      user:
+        name: "{{ username }}"
+        password: "{{ password | password_hash('sha256') }}"
+        comment: Awesome Developer
+        state: present
+        groups:
+          - docker
+          - "{{ groupname }}"
+        append: true
+        generate_ssh_key: yes
+        ssh_key_bits: 2048
+        ssh_key_comment: SSH Key for the Awesome Dev
+        uid: 1050
+        create_home: true
+      register: user_info
+
+    - name: Ensure sudo access
+      copy:
+        owner: root
+        group: root
+        mode: "u=r,g=,o="
+        content: |
+          {{ username }} ALL=(ALL) NOPASSWD: ALL
+        dest: "/etc/sudoers.d/{{ username }}-nopasswd"

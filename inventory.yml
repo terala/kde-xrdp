@@ -1,12 +1,10 @@
 all:
+  hosts:
+    localhost:
+      ansible_user: ubuntu
+      ansible_connection: local
+
   children:
-    ubuntu:
+    local:
       hosts:
-        xrdp:
-          ansible_host: 192.168.64.12
-          ansible_user: ubuntu
-          ansible_python_interpreter: /usr/bin/python3
-        kde:
-          ansible_host: 192.168.64.13
-          ansible_user: ubuntu
-          ansible_python_interpreter: /usr/bin/python3
+        localhost:
