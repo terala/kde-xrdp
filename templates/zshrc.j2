@@ -1,0 +1,11 @@
+{{ ansible_managed | comment }}
+
+export ZSH=$HOME/.oh-my-zsh
+ZSH_THEME="{{ ohmyzsh.theme }}"
+
+ENABLE_CORRECTION="{{ ohmyzsh.enable_correction }}"
+
+plugins=({{ ohmyzsh.plugins | join(' ') }})
+
+source $ZSH/oh-my-zsh.sh
+

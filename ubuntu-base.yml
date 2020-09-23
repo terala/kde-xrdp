@@ -24,6 +24,23 @@
       - git-extras
       - fzf
 
+    ohmyzsh:
+      theme: robbyrussell
+      enable_correction: true
+      plugins:
+        - git
+        - ansible
+        - colorize
+        - common-aliases
+        - docker
+        - docker-compose
+        - git-prompt
+        - git-extras
+        - golang
+        - history
+        - kubectl
+        - tmux
+        - sudo
   become: yes
   tasks:
     - name: Set a friendly hostname
@@ -59,6 +76,7 @@
         ssh_key_comment: SSH Key for the Awesome Dev
         uid: 1050
         create_home: true
+        shell: "/usr/bin/zsh"
       register: user_info
 
     - name: Ensure sudo access
@@ -69,3 +87,18 @@
         content: |
           {{ username }} ALL=(ALL) NOPASSWD: ALL
         dest: "/etc/sudoers.d/{{ username }}-nopasswd"
+
+    - name: Setup zsh and ohmyzsh for the user
+      become: yes
+      become_user: "{{ username }}"
+      block:
+        - name: Clone ohmyzsh repo
+          git:
+            repo: "https://github.com/ohmyzsh/ohmyzsh.git"
+            dest: "~{{ username }}/.oh-my-zsh"
+
+        - name: Deploy .zshrc
+          template:
+            src: zshrc.j2
+            dest: "~{{ username }}/.zshrc"
+            mode: u=rw
